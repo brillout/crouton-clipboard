@@ -16,6 +16,7 @@ function startServer() {
     })
     ws.on('close', ()=> fs.unwatchFile(dataFile))
   })
+  console.log("Listening on "+PORT)
 }
 
 function isPortTaken (port, fn) {
