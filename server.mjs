@@ -12,9 +12,6 @@ if (!fs.existsSync(dataFile)) fs.writeFileSync(dataFile, '\n')
 isPortTaken(PORT, startServer)
 
 function startServer() {
-  // console.log(ws)
-  // console.log(ws.Server)
-  // const WebSocketServer = ws.Server
   const wss = new WebSocketServer({port: PORT})
   wss.on('connection', ws => {
     ws.on('message', msg => {
