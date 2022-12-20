@@ -6,6 +6,7 @@ createListener(ws)
 var timeout;
 
 function onMsg(msg) {
+  console.log('onMsg()', msg);
   if (msg.event === 'copy') {
     if (timeout) {
       clearTimeout(timeout)
@@ -27,15 +28,17 @@ function onMsg(msg) {
 
 function createListener(ws) {
   ws.onmessage = msg => {
+    console.log('ws.onmessage', msg);
     if (msg.data instanceof Blob)
     reader = new FileReader()
     reader.onload = () => copyTextToClipboard(reader.result)
-    reader.readAsText(event.data)
+    reader.readAsText(msg.data)
   }
 }
 
 
 function copyTextToClipboard(text) {
+  console.log('copyTextToClipboard', text)
   var textArea = document.createElement("textarea");
   textArea.style.position = 'fixed';
   textArea.style.top = 0;

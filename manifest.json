@@ -1,10 +1,12 @@
 {
-  "manifest_version": 2.1,
+  "manifest_version": 2,
   "name": "Crouton Clipboard",
   "description": "Link between crouton clipboard and Chrome OS",
   "version": "1.0",
   "background": {
-    "page": "background.html"
+    "page": "background.html",
+    "// https://stackoverflow.com/questions/61862872/how-to-copy-web-notification-content-to-clipboard/61977696#61977696": "",
+    "// service_worker": "background.js"
   },
   "content_scripts": [{
     "matches": ["https://*/*","http://*/*"],
