@@ -3,7 +3,17 @@ import fs from 'fs'
 import net from 'net'
 import path from 'path'
 import url from 'url'
+import os from 'os'
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
+
+{
+  const __dirname_expected = os.homedir() + '/Downloads/.crouton-clipboard'
+  if (__dirname !== __dirname_expected) {
+    console.log(__dirname)
+    console.log(__dirname_expected)
+    throw new Error('Wrong location')
+  }
+}
 
 const PORT = 3396
 const dataFile = path.join(__dirname, './clipboard-data.txt')
