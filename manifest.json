@@ -8,8 +8,10 @@
     "// https://stackoverflow.com/questions/61862872/how-to-copy-web-notification-content-to-clipboard/61977696#61977696": "",
     "// service_worker": "background.js"
   },
-  "content_scripts": [{
-    "matches": ["https://*/*","http://*/*"],
-    "js": ["oncopy.js"]
-  }]
+  "content_scripts": [
+    {
+      "matches": ["https://*/*", "http://*/*"],
+      "js": ["oncopy.js"]
+    }
+  ]
 }

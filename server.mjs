@@ -22,9 +22,9 @@ if (!fs.existsSync(dataFile)) fs.writeFileSync(dataFile, '\n')
 isPortTaken(PORT, startServer)
 
 function startServer() {
-  const wss = new WebSocketServer({port: PORT})
-  wss.on('connection', ws => {
-    ws.on('message', msg => {
+  const wss = new WebSocketServer({ port: PORT })
+  wss.on('connection', (ws) => {
+    ws.on('message', (msg) => {
       console.log('message', msg.toString())
       fs.writeFile(dataFile, msg, () => {})
     })
@@ -33,20 +33,24 @@ function startServer() {
       console.log('send', clipboardData.toString())
       ws.send(clipboardData)
     })
-    ws.on('close', ()=> fs.unwatchFile(dataFile))
+    ws.on('close', () => fs.unwatchFile(dataFile))
   })
-  console.log("Listening on "+PORT)
+  console.log('Listening on ' + PORT)
 }
 
-function isPortTaken (port, fn) {
-  var tester = net.createServer()
-  .once('error', function (err) {
-    if (err.code != 'EADDRINUSE') return fn()
-    process.exit(0)
-  })
-  .once('listening', function() {
-    tester.once('close', function() { fn(null, false) })
-    .close()
-  })
-  .listen(port)
+function isPortTaken(port, fn) {
+  var tester = net
+    .createServer()
+    .once('error', function (err) {
+      if (err.code != 'EADDRINUSE') return fn()
+      process.exit(0)
+    })
+    .once('listening', function () {
+      tester
+        .once('close', function () {
+          fn(null, false)
+        })
+        .close()
+    })
+    .listen(port)
 }
