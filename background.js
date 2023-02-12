@@ -6,7 +6,7 @@ createListener(ws)
 var timeout
 
 function onMsg(msg) {
-  console.log('onMsg()', msg)
+  log('chrome.runtime.onMessage', msg)
   if (msg.event === 'copy') {
     if (timeout) {
       clearTimeout(timeout)
@@ -17,10 +17,12 @@ function onMsg(msg) {
         ws = new WebSocket('ws://localhost:' + PORT)
         createListener(ws)
         ws.onopen = () => {
+          log('[WebSocket][send]', msg.data)
           ws.send(msg.data)
         }
       }, 300)
     } else {
+      log('[WebSocket][send]', msg.data)
       ws.send(msg.data)
     }
   }
@@ -28,7 +30,7 @@ function onMsg(msg) {
 
 function createListener(ws) {
   ws.onmessage = (msg) => {
-    console.log('ws.onmessage', msg)
+    log('[WebSocket][message received]')
     if (msg.data instanceof Blob) reader = new FileReader()
     reader.onload = () => copyTextToClipboard(reader.result)
     reader.readAsText(msg.data)
@@ -36,7 +38,7 @@ function createListener(ws) {
 }
 
 function copyTextToClipboard(text) {
-  console.log('copyTextToClipboard', text)
+  log('[copyTextToClipboard]', text)
   var textArea = document.createElement('textarea')
   textArea.style.position = 'fixed'
   textArea.style.top = 0
@@ -53,10 +55,30 @@ function copyTextToClipboard(text) {
   textArea.select()
   try {
     var successful = document.execCommand('copy')
-    var msg = successful ? 'successful' : 'unsuccessful'
-    console.log('Copying text command was ' + msg)
+    var msg = successful ? 'SUCCESSFUL' : 'UNSUCCESSFUL'
+    log('[copyTextToClipboard] Copying text command was ' + msg)
   } catch (err) {
-    console.log('Oops, unable to copy')
+    log('[copyTextToClipboard] Oops, unable to copy')
   }
   document.body.removeChild(textArea)
+}
+
+function log(msg, ...msgs) {
+  msg = formatFirstMsg(msg)
+  msg = formatMsg(msg)
+  Object.keys(msgs).forEach((i) => {
+    msgs[i] = formatMsg(msgs[i])
+  })
+  console.log(`[${new Date().toLocaleTimeString()}]${msg}`, ...msgs)
+}
+function formatFirstMsg(msg) {
+  if (typeof msg !== 'string') return msg
+  if (!msg.startsWith('[') && !msg.startsWith(' ')) msg = ' ' + msg
+  return msg
+}
+function formatMsg(msg) {
+  if (typeof msg !== 'string') return msg
+  msg = msg.split(/\s/).join(' ')
+  if (msg.length > 100) msg = msg.slice(0, 100) + '...'
+  return msg
 }
