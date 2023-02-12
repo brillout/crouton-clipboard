@@ -30,7 +30,7 @@ function startServer() {
       fs.writeFileSync(dataFile, msg)
       log(`[${dataFile}][written]`, msg.toString())
     })
-    fs.watchFile(dataFile, () => {
+    fs.watchFile(dataFile, { interval: 700 }, () => {
       const clipboardData = fs.readFileSync(dataFile)
       log(`[${dataFile}][changed]`, clipboardData.toString())
       ws.send(clipboardData)
