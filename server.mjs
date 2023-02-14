@@ -4,20 +4,17 @@ import net from 'net'
 import path from 'path'
 import url from 'url'
 import os from 'os'
+import { createLogger, getTime } from './common.mjs'
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
-
-{
-  const __dirname_expected = os.homedir() + '/Downloads/.crouton-clipboard'
-  if (__dirname !== __dirname_expected) {
-    log(__dirname)
-    log(__dirname_expected)
-    throw new Error('Wrong location')
-  }
-}
-
 const PORT = 3396
-const dataFile = path.join(__dirname, './clipboard-data.txt')
-if (!fs.existsSync(dataFile)) fs.writeFileSync(dataFile, '\n')
+const dataFile = ensureFile('./data/clipboard.txt')
+const logsFile = ensureFile('./data/logs.txt')
+const pid = getTime()
+const log = createLogger(pid, writeLog)
+
+log('[startup]')
+
+assertLocation()
 
 isPortTaken(PORT, startServer)
 
@@ -58,22 +55,22 @@ function isPortTaken(port, fn) {
     .listen(port)
 }
 
-function log(msg, ...msgs) {
-  msg = formatFirstMsg(msg)
-  msg = formatMsg(msg)
-  Object.keys(msgs).forEach((i) => {
-    msgs[i] = formatMsg(msgs[i])
-  })
-  console.log(`[${new Date().toLocaleTimeString()}]${msg}`, ...msgs)
+function ensureFile(filePath) {
+  const filePathAbsolute = path.join(__dirname, filePath)
+  fs.mkdirSync(path.dirname(filePathAbsolute), { recursive: true })
+  if (!fs.existsSync(filePathAbsolute)) fs.writeFileSync(filePathAbsolute, '')
+  return filePathAbsolute
 }
-function formatFirstMsg(msg) {
-  if (typeof msg !== 'string') return msg
-  if (!msg.startsWith('[') && !msg.startsWith(' ')) msg = ' ' + msg
-  return msg
+
+function assertLocation() {
+  const __dirname_expected = os.homedir() + '/Downloads/.crouton-clipboard'
+  if (__dirname !== __dirname_expected) {
+    log(__dirname)
+    log(__dirname_expected)
+    throw new Error('Wrong location')
+  }
 }
-function formatMsg(msg) {
-  if (typeof msg !== 'string') return msg
-  msg = msg.split(/\s/).join(' ')
-  if (msg.length > 100) msg = msg.slice(0, 100) + '...'
-  return msg
+
+function writeLog(...msgs) {
+  fs.appendFileSync(logsFile, msgs.join(' ') + '\n')
 }

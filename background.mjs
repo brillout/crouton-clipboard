@@ -1,5 +1,11 @@
+import { createLogger, getTime } from './common.mjs'
+const pid = getTime()
+const log = createLogger(pid)
+const PORT = 3396
+
+log('[startup]')
+
 chrome.runtime.onMessage.addListener(onMsg)
-var PORT = 3396
 
 var ws = new WebSocket('ws://localhost:' + PORT)
 createListener(ws)
@@ -31,9 +37,11 @@ function onMsg(msg) {
 function createListener(ws) {
   ws.onmessage = (msg) => {
     log('[WebSocket][message received]')
-    if (msg.data instanceof Blob) reader = new FileReader()
+    const { data } = msg
+    if (!(data instanceof Blob)) throw new Error('Unpexted message payload')
+    const reader = new FileReader()
     reader.onload = () => copyTextToClipboard(reader.result)
-    reader.readAsText(msg.data)
+    reader.readAsText(data)
   }
 }
 
@@ -61,24 +69,4 @@ function copyTextToClipboard(text) {
     log('[copyTextToClipboard] Oops, unable to copy')
   }
   document.body.removeChild(textArea)
-}
-
-function log(msg, ...msgs) {
-  msg = formatFirstMsg(msg)
-  msg = formatMsg(msg)
-  Object.keys(msgs).forEach((i) => {
-    msgs[i] = formatMsg(msgs[i])
-  })
-  console.log(`[${new Date().toLocaleTimeString()}]${msg}`, ...msgs)
-}
-function formatFirstMsg(msg) {
-  if (typeof msg !== 'string') return msg
-  if (!msg.startsWith('[') && !msg.startsWith(' ')) msg = ' ' + msg
-  return msg
-}
-function formatMsg(msg) {
-  if (typeof msg !== 'string') return msg
-  msg = msg.split(/\s/).join(' ')
-  if (msg.length > 100) msg = msg.slice(0, 100) + '...'
-  return msg
 }
