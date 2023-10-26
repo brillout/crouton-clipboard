@@ -3,7 +3,6 @@ import fs from 'fs'
 import net from 'net'
 import path from 'path'
 import url from 'url'
-import os from 'os'
 import { createLogger, getTime } from './common.mjs'
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 const PORT = 3396
@@ -63,15 +62,10 @@ function ensureFile(filePath) {
 }
 
 function assertLocation() {
-  const __dirname_expected = os.homedir() + '/Downloads/.crouton-clipboard'
-  if (__dirname !== __dirname_expected) {
+  const end = '/Downloads/.crouton-clipboard'
+  if (!__dirname.endsWith(end)) {
     throw new Error(
-      [
-        //
-        'Wrong location.',
-        `__dirname:\n  ${__dirname}`,
-        `__dirname_expected:\n  ${__dirname_expected}`
-      ].join('\n')
+      `Wrong location: __dirname is ${__dirname} but it should end with ${end} ensuring that the server script lives in the same Git repository as the Chrome extension (my Chrome settings are saved to load the extenion from ~${end}`
     )
   }
 }
