@@ -65,9 +65,14 @@ function ensureFile(filePath) {
 function assertLocation() {
   const __dirname_expected = os.homedir() + '/Downloads/.crouton-clipboard'
   if (__dirname !== __dirname_expected) {
-    log(__dirname)
-    log(__dirname_expected)
-    throw new Error('Wrong location')
+    throw new Error(
+      [
+        //
+        'Wrong location.',
+        `__dirname ${__dirname}`,
+        `__dirname_expected ${__dirname_expected}`
+      ].join('\n')
+    )
   }
 }
 
