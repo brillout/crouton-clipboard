@@ -69,8 +69,8 @@ function assertLocation() {
       [
         //
         'Wrong location.',
-        `__dirname ${__dirname}`,
-        `__dirname_expected ${__dirname_expected}`
+        `__dirname:\n  ${__dirname}`,
+        `__dirname_expected:\n  ${__dirname_expected}`
       ].join('\n')
     )
   }
